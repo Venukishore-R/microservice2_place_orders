@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option go_package = "github.com/Venukishore-R/microservice2_place_orders/protos";
+
+message Order {
+  string name = 1;
+  string quantity = 2;
+  string price = 3;
+}
+
+message CreateOrderResp {
+  int64 status = 1;
+}
+
+service OrderService {
+  rpc CreateOrder(Order) returns(CreateOrderResp);
+}
