@@ -2,16 +2,38 @@ syntax = "proto3";
 
 option go_package = "github.com/Venukishore-R/microservice2_place_orders/protos";
 
+message OrderEmpty {}
+
 message Order {
   string name = 1;
   string quantity = 2;
   string price = 3;
 }
 
-message CreateOrderResp {
+message GetDeleteOrderReq {
+  int64 id = 1;
+}
+
+message UpdateOrderReq {
+  int64 id = 1;
+  Order order = 2;
+}
+
+message GetOrderResp {
+  Order order = 1;
+}
+
+message CreateUpdateDeleteOrderResp {
   int64 status = 1;
 }
 
+message GetOrdersResp{
+  repeated Order Order = 1;
+}
 service OrderService {
-  rpc CreateOrder(Order) returns(CreateOrderResp);
+  rpc CreateOrder(Order) returns(CreateUpdateDeleteOrderResp);
+  rpc GetOrders(OrderEmpty) returns(GetOrdersResp);
+  rpc GetOrder(GetDeleteOrderReq) returns(GetOrderResp);
+  rpc UpdateOrder(UpdateOrderReq) returns(CreateUpdateDeleteOrderResp);
+  rpc DeleteOrder(GetDeleteOrderReq) returns(CreateUpdateDeleteOrderResp);
 }

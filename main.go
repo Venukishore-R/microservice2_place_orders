@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/Venukishore-R/microservice2_place_orders/endpoints"
 	"github.com/Venukishore-R/microservice2_place_orders/middlewares"
 	"github.com/Venukishore-R/microservice2_place_orders/models"
@@ -14,11 +15,12 @@ import (
 	"google.golang.org/grpc"
 	"gorm.io/driver/postgres"
 
-	"gorm.io/gorm"
 	"net"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"gorm.io/gorm"
 )
 
 func init() {
@@ -53,6 +55,7 @@ func main() {
 	service := services.NewLoggerService(logger)
 	makeEndpoints := endpoints.MakeEndpoints(service)
 	makeEndpoints.CreateOrder = middlewares.Mid()(makeEndpoints.CreateOrder)
+	makeEndpoints.GetOrders = middlewares.Mid()(makeEndpoints.GetOrders)
 	server := transports.NewMyServer(logger, makeEndpoints)
 
 	errs := make(chan error)

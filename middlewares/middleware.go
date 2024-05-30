@@ -3,6 +3,8 @@ package middlewares
 import (
 	"context"
 	"fmt"
+	slog "log"
+
 	"github.com/Venukishore-R/microservice1_auth/protos"
 	"github.com/go-kit/kit/auth/jwt"
 	"github.com/go-kit/kit/endpoint"
@@ -10,7 +12,6 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/metadata"
-	slog "log"
 )
 
 var logger log.Logger
@@ -18,9 +19,7 @@ var logger log.Logger
 func Mid() endpoint.Middleware {
 	return func(next endpoint.Endpoint) endpoint.Endpoint {
 		return func(ctx context.Context, request interface{}) (response interface{}, err error) {
-			slog.Print(ctx)
-			slog.Print(request)
-
+			slog.Print("context 111", ctx)
 			var conn *grpc.ClientConn
 			conn, err = grpc.NewClient(":5005", grpc.WithTransportCredentials(insecure.NewCredentials()))
 			if err != nil {
@@ -34,12 +33,12 @@ func Mid() endpoint.Middleware {
 
 			md := metadata.New(map[string]string{"authorization": "Bearer " + tok})
 			ctx = metadata.NewOutgoingContext(ctx, md)
+			slog.Print("context ", ctx)
 
 			var header metadata.MD
 
 			response, err = client.Authenticate(ctx, &protos.Empty{}, grpc.Header(&header))
 
-			slog.Print("resp", response)
 			if err != nil {
 				slog.Printf("err1 %v", err)
 				return nil, err
@@ -56,7 +55,6 @@ func Mid() endpoint.Middleware {
 			ctx = context.WithValue(ctx, "Email", resp.Email)
 			ctx = context.WithValue(ctx, "Phone", resp.Phone)
 
-			slog.Print(ctx)
 			return next(ctx, request)
 		}
 	}
